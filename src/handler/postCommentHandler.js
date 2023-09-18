@@ -1,38 +1,32 @@
+const { fetchPost } = require("./postHandler.js");
+const { fetchComment } = require("./commentHandler.js");
+
 const postCommentHandler = {};
 
-const postUrl = "https://jsonplaceholder.typicode.com/posts";
-const commentUrl = "https://jsonplaceholder.typicode.com/comments";
-
 postCommentHandler.getAllPostComment = (req, res) => {
-  fetch(postUrl)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`HTTP Error! Status: ${response.status}`);
-      }
-      return response.json();
-    })
-    .then((postData) => {
-      fetch(commentUrl)
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error(`HTTP Error! Status: ${response.status}`);
-          }
-          return response.json();
-        })
-        .then((commentData) => {
-          const combinedData = postData.map((postItem) => {
-            const comments = commentData.filter(
-              (commentItem) => commentItem.postId === postItem.id
-            );
+  mergeData(res);
+};
+
+function mergeData(res) {
+  fetchPost
+    .then((dataPost) => {
+      fetchComment
+        .then((dataComment) => {
+          const combinedData = dataPost.map((post) => {
+            const comments = dataComment.filter((comment) => {
+              if (comment.postId === post.id) {
+                return comment;
+              }
+            });
             return {
-              id: postItem.id,
-              judulPost: postItem.title,
-              contentPost: postItem.body,
-              comments: comments.map((comment) => ({
-                postId: comment.postId,
-                nameUser: comment.name,
-                emailUser: comment.email,
-                contentComment: comment.body,
+              id: post.id,
+              judulPost: post.title,
+              contentPost: post.body,
+              comments: comments.map((c) => ({
+                postId: c.postId,
+                namaUser: c.name,
+                emailUser: c.email,
+                contentComment: c.body,
               })),
             };
           });
@@ -51,6 +45,6 @@ postCommentHandler.getAllPostComment = (req, res) => {
       res.writeHead(500, { "Content-Type": "text/plain" });
       res.end("Internal Server Error");
     });
-};
+}
 
 module.exports = postCommentHandler;

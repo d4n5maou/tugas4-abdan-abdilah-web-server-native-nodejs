@@ -1,32 +1,29 @@
-const https = require("node:https");
-
 const url = "https://jsonplaceholder.typicode.com/comments";
 
 const commentHandler = {};
 
 commentHandler.getAllComment = (req, res) => {
-  https
-    .get(url, (response) => {
-      let responseData = "";
-
-      response.on("data", (d) => {
-        responseData += d;
-      });
-
-      response.on("end", () => {
-        const parsedData = JSON.parse(responseData);
-        const modifiedData = modifiedDataComment(parsedData);
-
-        res.writeHead(200, { "Content-Type": "application/json" });
-        res.end(JSON.stringify(modifiedData));
-      });
-    })
-    .on("error", (err) => {
-      console.error(err);
-      res.writeHead(500, { "Content-Type": "text/plain" });
-      res.end("Internal Server Error");
-    });
+  fetchComment.then((dataComment) => {
+    const modifiedData = modifiedDataComment(dataComment);
+    res.end(JSON.stringify(modifiedData));
+  });
 };
+
+const fetchComment = fetch(url)
+  .then((respone) => {
+    if (!respone.ok) {
+      throw new Error(`HTTP Error! Status ${respone.status}`);
+    }
+    return respone.json();
+  })
+  .then((data) => {
+    return data;
+  })
+  .catch((error) => {
+    console.log(error);
+    res.writeHead(500, { "Content-Type": "text/plain" });
+    res.end("Internal Server Error");
+  });
 
 function modifiedDataComment(data) {
   const newData = data.map((item) => ({
@@ -38,4 +35,4 @@ function modifiedDataComment(data) {
   return newData;
 }
 
-module.exports = commentHandler;
+module.exports = { commentHandler, fetchComment };

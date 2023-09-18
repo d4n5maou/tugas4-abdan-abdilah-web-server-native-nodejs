@@ -3,25 +3,28 @@ const postHandler = {};
 const url = "https://jsonplaceholder.typicode.com/posts";
 
 postHandler.getAllPost = (req, res) => {
-  fetch(url)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`HTTP Error! Status: ${response.status}`);
-      }
-      return response.json();
-    })
-    .then((data) => {
-      const modifiedData = modifiedDataPost(data);
+  fetchPost.then((dataPost) => {
+    const modifiedData = modifiedDataPost(dataPost);
 
-      res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(JSON.stringify(modifiedData));
-    })
-    .catch((error) => {
-      console.error(error);
-      res.writeHead(500, { "Content-Type": "text/plain" });
-      res.end("Internal Server Error");
-    });
+    res.end(JSON.stringify(modifiedData));
+  });
 };
+
+const fetchPost = fetch(url)
+  .then((response) => {
+    if (!response.ok) {
+      throw new Error(`HTTP Error! Status: ${response.status}`);
+    }
+    return response.json();
+  })
+  .then((data) => {
+    return data;
+  })
+  .catch((error) => {
+    console.error(error);
+    res.writeHead(500, { "Content-Type": "text/plain" });
+    res.end("Internal Server Error");
+  });
 
 function modifiedDataPost(data) {
   const newData = data.map((item) => ({
@@ -33,4 +36,4 @@ function modifiedDataPost(data) {
   return newData;
 }
 
-module.exports = postHandler;
+module.exports = { postHandler, fetchPost };

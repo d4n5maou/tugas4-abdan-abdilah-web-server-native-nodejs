@@ -1,5 +1,5 @@
-const postHandler = require("../handler/postHandler");
-const commentHandler = require("../handler/commentHandler");
+const { postHandler } = require("../handler/postHandler");
+const { commentHandler } = require("../handler/commentHandler");
 const postCommentHandler = require("../handler/postCommentHandler");
 
 const router = {};
