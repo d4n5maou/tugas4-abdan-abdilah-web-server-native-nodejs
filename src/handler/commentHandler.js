@@ -3,26 +3,25 @@ const url = "https://jsonplaceholder.typicode.com/comments";
 const commentHandler = {};
 
 commentHandler.getAllComment = (req, res) => {
-  fetchComment.then((dataComment) => {
-    const modifiedData = modifiedDataComment(dataComment);
-    res.end(JSON.stringify(modifiedData));
-  });
+  fetchComment
+    .then((dataComment) => {
+      const modifiedData = modifiedDataComment(dataComment);
+      res.end(JSON.stringify(modifiedData));
+    })
+    .catch((error) => {
+      console.log(error);
+      res.writeHead(500, { "Content-Type": "text/plain" });
+      res.end("Internal Server Error");
+    });
 };
 
+//data comments dari url
 const fetchComment = fetch(url)
   .then((respone) => {
-    if (!respone.ok) {
-      throw new Error(`HTTP Error! Status ${respone.status}`);
-    }
     return respone.json();
   })
   .then((data) => {
     return data;
-  })
-  .catch((error) => {
-    console.log(error);
-    res.writeHead(500, { "Content-Type": "text/plain" });
-    res.end("Internal Server Error");
   });
 
 function modifiedDataComment(data) {
